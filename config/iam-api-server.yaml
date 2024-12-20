@@ -1,0 +1,37 @@
+# REST API server configuration
+server:
+  mode: debug # server mode: release, debug, test, 默认为release
+  headlthz: true # 开启健康检查
+  middlewares: # gin中间件: 多个中间件，逗号分隔
+  max-ping-count: 10 # 最大ping次数
+
+# MySQL 配置
+mysql:
+  host: localhost:3306 # 数据库地址
+  user: apiuser # 数据库用户名
+  password: apipwd # 数据库密码
+  database: iam # 数据库名称
+  max-idle-conns: 100 # MySQL 最大空闲连接数，默认 100
+  max-open-conns: 100 # MySQL 最大打开的连接数，默认 100
+  max-conn-life-time: 10s # 空闲连接最大存活时间，默认 10s
+  log-level: 4 # GORM log level, 1: silent, 2:error, 3:warn, 4:info
+
+# HTTP 配置
+insecure:
+  bind-address: 127.0.0.1 # 绑定的不安全 IP 地址，设置为 0.0.0.0 表示使用全部网络接口，默认为 127.0.0.1
+  bind-port: 8080 # 提供非安全认证的监听端口，默认为 8080
+
+# HTTPS 配置
+secure:
+  bind-address: 0.0.0.0 # HTTPS 安全模式的 IP 地址，默认为 0.0.0.0
+  bind-port: 8443 # 使用 HTTPS 安全模式的端口号，设置为 0 表示不启用 HTTPS，默认为 8443
+  tls:
+    #cert-dir: .iam/cert # TLS 证书所在的目录，默认值为 /var/run/iam
+    #pair-name: iam # TLS 私钥对名称，默认 iam
+    cert-key:
+      cert-file: ../../config/certs/iam-api-server/iam-api-server.pem # 包含 x509 证书的文件路径，用 HTTPS 认证
+      private-key-file: ../../config/certs/iam-api-server/iam-api-server-key.pem # TLS 私钥
+
+feature:
+  enable-profiling: false
+  enable-metrics: false
