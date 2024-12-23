@@ -8,8 +8,8 @@ import (
 )
 
 type apiServer struct {
-	gs        *graceful.GracefulShutdown
-	ginServer *ginserver.Server
+	gracefulShutdown *graceful.GracefulShutdown
+	ginServer        *ginserver.Server
 	// todo redisServer gRPCServer
 }
 
@@ -33,8 +33,8 @@ func newAPIServer(cfg *config.Config) (*apiServer, error) {
 	}
 
 	return &apiServer{
-		gs:        gs,
-		ginServer: ginServer,
+		gracefulShutdown: gs,
+		ginServer:        ginServer,
 	}, nil
 }
 
@@ -61,6 +61,16 @@ func buildGinServerConfig(cfg *config.Config) (gConf *ginserver.Config, lastErr 
 }
 
 func (s *apiServer) PreRun() *preApiServer {
+	initRouter(s.ginServer.Engine)
+
+	s.gracefulShutdown.AddShutdownCallback(graceful.OnShutdownFunc(func(str string) error {
+		// todo 关闭mysql、grpc
+
+		s.ginServer.Shutdown()
+
+		return nil
+	}))
+
 	return &preApiServer{s}
 }
 
@@ -69,5 +79,10 @@ type preApiServer struct {
 }
 
 func (s *preApiServer) Run() error {
-	return nil
+
+	if err := s.gracefulShutdown.Start(); err != nil {
+		panic(err)
+	}
+
+	return s.ginServer.Run()
 }

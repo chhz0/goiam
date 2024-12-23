@@ -35,6 +35,7 @@ func (s *Server) setup() {
 
 func (s *Server) installMiddlewares() {
 	s.Use(middleware.RequestId())
+	s.Use(middleware.Context())
 
 	for _, m := range s.Conf.Middlewares {
 		mw, ok := middleware.GinMiddlewares[m]
@@ -76,7 +77,7 @@ func (s *Server) Run() error {
 	var eg errgroup.Group
 
 	eg.Go(func() error {
-		if err := s.insecureServer.ListenAndServe(); err != nil {
+		if err := s.insecureServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			return err
 		}
 		return nil

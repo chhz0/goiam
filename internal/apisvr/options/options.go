@@ -10,8 +10,9 @@ type APIServerOptions struct {
 	Server          *options.ServerRunOptions       `json:"server" mapstructure:"server"`
 	SecureServing   *options.SecureServingOptions   `json:"secure" mapstructure:"secure"`
 	InsecureServing *options.InsecureServingOptions `json:"insecure" mapstructure:"insecure"`
-	Fearure         *options.FeatureOptions         `json:"feature" mapstructure:"feature"`
+	Jwt             *options.JwtOptions             `json:"jwt" mapstructure:"jwt"`
 	MySQL           *options.MySQLOptions           `json:"mysql" mapstructure:"mysql"`
+	Fearure         *options.FeatureOptions         `json:"feature" mapstructure:"feature"`
 }
 
 // LocalFlagsAndRequired implements simplecobra.Flags.
@@ -21,12 +22,14 @@ func (o *APIServerOptions) LocalFlagsAndRequired() (fs *pflag.FlagSet, required 
 	serverFlags, _ := o.Server.LocalFlagsAndRequired()
 	secureServingFlags, _ := o.SecureServing.LocalFlagsAndRequired()
 	insecureServingFlags, _ := o.InsecureServing.LocalFlagsAndRequired()
+	jwtFlags, _ := o.Jwt.LocalFlagsAndRequired()
 	featureFlags, _ := o.Fearure.LocalFlagsAndRequired()
 	mysqlFlags, _ := o.MySQL.LocalFlagsAndRequired()
 
 	fs.AddFlagSet(serverFlags)
 	fs.AddFlagSet(secureServingFlags)
 	fs.AddFlagSet(insecureServingFlags)
+	fs.AddFlagSet(jwtFlags)
 	fs.AddFlagSet(featureFlags)
 	fs.AddFlagSet(mysqlFlags)
 
@@ -45,6 +48,7 @@ func NewNilAPIOptions() *APIServerOptions {
 		Server:          options.NewDefaultServerRunOptions(),
 		SecureServing:   options.NewDefaultSecureOptions(),
 		InsecureServing: options.NewDefaultInsecureOptions(),
+		Jwt:             options.NewDefaultJwtOptions(),
 		Fearure:         options.NewDefaultFeatureOptions(),
 		MySQL:           options.NewDefaultMySQLOptions(),
 	}

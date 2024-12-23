@@ -79,7 +79,7 @@ var _ simplecobra.Flags = (*SecureServingOptions)(nil)
 
 func (s *SecureServingOptions) AppendToServer(c *ginserver.Config) error {
 	c.SecureServing.BindAddress = s.BindAddress
-	c.SecureServing.BindAddress = s.BindAddress
+	c.SecureServing.BindPort = s.BindPort
 	c.SecureServing.CertKey = ginserver.CertKey{
 		Cert: s.TLS.CertKey.CertFile,
 		Key:  s.TLS.CertKey.PrivateKeyFile,

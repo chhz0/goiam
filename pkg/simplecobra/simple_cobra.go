@@ -237,7 +237,7 @@ func (rc *RootCommand) Run(args []string) error {
 		if err := viper.Unmarshal(rc.FlagSet); err != nil {
 			return err
 		}
-		printConfig()
+		// printConfig()
 	}
 
 	return rc.RunFunc(context.Background(), args)

@@ -88,8 +88,8 @@ func (gs *GracefulShutdown) Shutdown(sm ShutdownManager) {
 
 func New() *GracefulShutdown {
 	return &GracefulShutdown{
-		callbacks: make([]ShutdownCallback, 10),
-		managers:  make([]ShutdownManager, 3),
+		callbacks: make([]ShutdownCallback, 0),
+		managers:  make([]ShutdownManager, 0),
 	}
 }
 

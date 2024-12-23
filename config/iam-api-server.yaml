@@ -5,16 +5,6 @@ server:
   middlewares: # gin中间件: 多个中间件，逗号分隔
   max-ping-count: 10 # 最大ping次数
 
-# MySQL 配置
-mysql:
-  host: localhost:3306 # 数据库地址
-  user: apiuser # 数据库用户名
-  password: apipwd # 数据库密码
-  database: iam # 数据库名称
-  max-idle-conns: 100 # MySQL 最大空闲连接数，默认 100
-  max-open-conns: 100 # MySQL 最大打开的连接数，默认 100
-  max-conn-life-time: 10s # 空闲连接最大存活时间，默认 10s
-  log-level: 4 # GORM log level, 1: silent, 2:error, 3:warn, 4:info
 
 # HTTP 配置
 insecure:
@@ -32,6 +22,25 @@ secure:
       cert-file: ../../config/certs/iam-api-server/iam-api-server.pem # 包含 x509 证书的文件路径，用 HTTPS 认证
       private-key-file: ../../config/certs/iam-api-server/iam-api-server-key.pem # TLS 私钥
 
+# JWT 配置
+jwt:
+  realm: iam jwt # JWT 认证的领域
+  key: eyJyZWFsbSI6ImlhbS5oZWxsb2NoLm # 认证的密钥, 服务端密钥
+  timeout: 24h # JWT 认证的过期时间
+  max-refresh: 24h # JWT 认证的刷新时间
+
+# server feature 配置 是一些监控
 feature:
   enable-profiling: false
   enable-metrics: false
+
+# MySQL 配置
+mysql:
+  host: localhost:3306 # 数据库地址
+  user: apiuser # 数据库用户名
+  password: apipwd # 数据库密码
+  database: iam # 数据库名称
+  max-idle-conns: 100 # MySQL 最大空闲连接数，默认 100
+  max-open-conns: 100 # MySQL 最大打开的连接数，默认 100
+  max-conn-life-time: 10s # 空闲连接最大存活时间，默认 10s
+  log-level: 4 # GORM log level, 1: silent, 2:error, 3:warn, 4:info
