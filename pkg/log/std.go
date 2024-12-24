@@ -9,7 +9,7 @@ import (
 var stdLogger atomic.Pointer[zapLogger]
 
 func init() {
-	stdLogger.Store(new(os.Stdout, InfoLevel, defaultZapOptions()...))
+	stdLogger.Store(newZaplogger(os.Stdout, InfoLevel, JsonEncoder, defaultZapOptions()...))
 }
 func ZapLogger() *zapLogger {
 	return stdLogger.Load()
@@ -119,8 +119,13 @@ func SetLevel(level Level) {
 	stdLogger.Load().SetLevel(level)
 }
 
-func ReplaceDefault(zlog *zapLogger) {
-	stdLogger.Store(zlog)
+func ReplaceDefault(l Logger) {
+	stdLogger.Store(l.(*zapLogger))
+}
+
+func Named(name string) {
+	nl := stdLogger.Load().WithName(name)
+	stdLogger.Store(nl.(*zapLogger))
 }
 
 func FromContext(ctx context.Context) Logger {

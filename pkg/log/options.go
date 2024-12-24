@@ -1,6 +1,8 @@
 package log
 
-import "go.uber.org/zap"
+import (
+	"go.uber.org/zap"
+)
 
 type ZapOption = zap.Option
 
@@ -18,10 +20,3 @@ var (
 	WithFatalHook = zap.WithFatalHook
 	WithClock     = zap.WithClock
 )
-
-type Option struct {
-	Level Level
-
-	ZapOpts *ZapOption
-	TeeOpts []TeeOption
-}

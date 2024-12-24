@@ -1,4 +1,4 @@
-// todo: 基于zap zapcore进行二次封装，扩展的log日志库，使用支持的弱类型的sugar操作
+// 基于zap zapcore进行二次封装，扩展的log日志库，使用支持的弱类型的sugar操作
 package log
 
 import (
@@ -25,39 +25,6 @@ const (
 type zapLogger struct {
 	l  *zap.Logger
 	al *zap.AtomicLevel
-}
-
-func new(out io.Writer, level Level, opts ...ZapOption) *zapLogger {
-	if out == nil {
-		out = os.Stdout
-	}
-
-	atomicl := zap.NewAtomicLevelAt(level)
-	encoderConfig := &zapcore.EncoderConfig{
-		TimeKey:        "timestamp",
-		LevelKey:       "level",
-		NameKey:        "logger",
-		CallerKey:      "caller",
-		FunctionKey:    zapcore.OmitKey,
-		MessageKey:     "msg",
-		StacktraceKey:  "stacktrace",
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.LowercaseLevelEncoder,
-		EncodeTime:     zapcore.RFC3339TimeEncoder,
-		EncodeDuration: zapcore.SecondsDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
-	}
-
-	core := zapcore.NewCore(
-		zapcore.NewJSONEncoder(*encoderConfig),
-		zapcore.AddSync(out),
-		atomicl,
-	)
-
-	return &zapLogger{
-		l:  zap.New(core, opts...),
-		al: &atomicl,
-	}
 }
 
 func (l *zapLogger) Info(msg string, fields ...Field) {
@@ -246,5 +213,47 @@ func (l *zapLogger) clone() *zapLogger {
 func (l *zapLogger) SetLevel(level Level) {
 	if l.al != nil {
 		l.al.SetLevel(level)
+	}
+}
+
+type Output func() io.Writer
+
+func NewLogger(out Output, lvl Level, encoder LogEncoder, zOpts ...ZapOption) Logger {
+	return newZaplogger(out(), lvl, encoder, zOpts...)
+}
+
+type LogEncoder string
+
+const (
+	ConsoleEncoder LogEncoder = "Console"
+	JsonEncoder    LogEncoder = "Json"
+)
+
+func newZaplogger(out io.Writer, level Level, encoder LogEncoder, opts ...ZapOption) *zapLogger {
+	if out == nil {
+		out = os.Stdout
+	}
+
+	atomicl := zap.NewAtomicLevelAt(level)
+	encoderConfig := defaultEncoderConfig()
+	core := zapcore.NewCore(
+		coreEncoder(encoder, encoderConfig),
+		zapcore.AddSync(out),
+		atomicl,
+	)
+	return &zapLogger{
+		l:  zap.New(core, opts...),
+		al: &atomicl,
+	}
+}
+
+func coreEncoder(encoder LogEncoder, encoderConfig *zapcore.EncoderConfig) zapcore.Encoder {
+	switch encoder {
+	case ConsoleEncoder:
+		return zapcore.NewConsoleEncoder(*encoderConfig)
+	case JsonEncoder:
+		return zapcore.NewJSONEncoder(*encoderConfig)
+	default:
+		return zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig())
 	}
 }

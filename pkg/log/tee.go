@@ -11,53 +11,44 @@ import (
 type LevelEnablerFunc func(lvl Level) bool
 
 type TeeOption struct {
-	out string
+	Output io.Writer
 	LevelEnablerFunc
 }
 
-func newTee(tees []TeeOption, opts ...ZapOption) *zapLogger {
+// newTee creates a new tee logger.
+// 默认使用的 日志级别为 InfoLevel，
+func newTee(tees []TeeOption, encoder LogEncoder, opts ...ZapOption) *zapLogger {
 	cores := make([]zapcore.Core, 0, len(tees))
 
 	for _, tee := range tees {
-		var out io.Writer
-
-		out = os.Stdout
-		if tee.out != "" {
-			out = openLogFile(tee.out)
+		if tee.Output == nil {
+			tee.Output = os.Stdout
 		}
 
-		encoderConfig := &zapcore.EncoderConfig{
-			TimeKey:        "timestamp",
-			LevelKey:       "level",
-			NameKey:        "logger",
-			CallerKey:      "caller",
-			FunctionKey:    zapcore.OmitKey,
-			MessageKey:     "msg",
-			StacktraceKey:  "stacktrace",
-			LineEnding:     zapcore.DefaultLineEnding,
-			EncodeLevel:    zapcore.LowercaseLevelEncoder,
-			EncodeTime:     zapcore.RFC3339TimeEncoder,
-			EncodeDuration: zapcore.SecondsDurationEncoder,
-			EncodeCaller:   zapcore.ShortCallerEncoder,
-		}
+		encoderConfig := defaultEncoderConfig()
 		core := zapcore.NewCore(
-			zapcore.NewJSONEncoder(*encoderConfig),
-			zapcore.AddSync(out),
+			coreEncoder(encoder, encoderConfig),
+			zapcore.AddSync(tee.Output),
 			zap.LevelEnablerFunc(tee.LevelEnablerFunc),
 		)
 		cores = append(cores, core)
 	}
 
+	atomicl := zap.NewAtomicLevelAt(InfoLevel)
 	return &zapLogger{
 		l:  zap.New(zapcore.NewTee(cores...), opts...),
-		al: nil,
+		al: &atomicl,
 	}
 }
 
-func openLogFile(file string) io.Writer {
+func OpenLogFile(file string) io.Writer {
 	logf, err := os.OpenFile(file, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
 	if err != nil {
 		panic("open log file failed")
 	}
 	return logf
+}
+
+func NewTeeLogger(tees []TeeOption, encoder LogEncoder, opts ...ZapOption) Logger {
+	return newTee(tees, encoder, opts...)
 }

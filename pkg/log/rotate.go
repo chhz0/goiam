@@ -51,14 +51,13 @@ func NewRotateByTime(cfg *RotateConfig) io.Writer {
 	opts := []rotatelogs.Option{
 		rotatelogs.WithMaxAge(time.Duration(cfg.MaxAge) * time.Hour * 24),
 		rotatelogs.WithRotationTime(cfg.RotationTime),
-		rotatelogs.WithLinkName(cfg.Filename),
 	}
 	if !cfg.LocalTime {
 		rotatelogs.WithClock(rotatelogs.UTC)
 	}
 	filename := strings.SplitN(cfg.Filename, ".", 2)
 	logs, err := rotatelogs.New(
-		filename[0]+".%Y-%m-%d-%H-%M-%S"+filename[1],
+		filename[0]+".%Y-%m-%d-%H-%M-%S."+filename[1],
 		opts...,
 	)
 	if err != nil {

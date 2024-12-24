@@ -65,3 +65,8 @@ func TestStd_L(t *testing.T) {
 	l := L(context.Background(), "key1", "key2")
 	l.Info("std l test std l test")
 }
+
+func TestStd_Named(t *testing.T) {
+	Named("named-logger")
+	Info("std named test std named test")
+}
