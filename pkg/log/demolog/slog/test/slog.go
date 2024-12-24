@@ -3,7 +3,7 @@ package main
 import (
 	"log/slog"
 
-	log "github.com/chhz0/goiam/pkg/log/slog"
+	log "github.com/chhz0/goiam/pkg/log/demolog/slog"
 )
 
 type contextKey string

@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/chhz0/goiam/pkg/log/zlog"
+	"github.com/chhz0/goiam/pkg/log/demolog/zlog"
 	"go.uber.org/zap/zapcore"
 )
 
