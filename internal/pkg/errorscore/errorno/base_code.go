@@ -1,4 +1,4 @@
-package errorsno
+package errorno
 
 const (
 	ErrUndefind int = -999

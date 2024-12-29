@@ -3,7 +3,7 @@ package auth
 import (
 	"strings"
 
-	"github.com/chhz0/goiam/internal/pkg/constants/errorsno"
+	"github.com/chhz0/goiam/internal/pkg/errorscore/errorno"
 	"github.com/chhz0/goiam/internal/pkg/httpcore"
 	"github.com/chhz0/goiam/internal/pkg/middleware"
 	"github.com/chhz0/goiam/pkg/errors"
@@ -53,7 +53,7 @@ func (a AutoStrategy) AuthFunc() gin.HandlerFunc {
 
 		if len(authHeader) != 2 {
 			httpcore.WriteResponse(ctx,
-				errors.WithCodef(errorsno.ErrInvalidAuthHeader, "Authorization header format is wrong."),
+				errors.WithCodef(errorno.ErrInvalidAuthHeader, "Authorization header format is wrong."),
 				nil,
 			)
 			ctx.Abort()
@@ -68,7 +68,7 @@ func (a AutoStrategy) AuthFunc() gin.HandlerFunc {
 			operation.SetStrategy(a.jwt)
 		default:
 			httpcore.WriteResponse(ctx,
-				errors.WithCodef(errorsno.ErrSignatureInvalid, "unrecognized Authorization header."),
+				errors.WithCodef(errorno.ErrSignatureInvalid, "unrecognized Authorization header."),
 				nil,
 			)
 			ctx.Abort()

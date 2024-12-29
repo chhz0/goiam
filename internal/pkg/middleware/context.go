@@ -1,14 +1,20 @@
 package middleware
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/chhz0/goiam/internal/pkg/logger"
+	"github.com/gin-gonic/gin"
+)
 
-const UsernameKey = "username"
+const (
+	KeyUsername = "username"
+	KeyUserID   = "userID"
+)
 
-// Context 是一个中间件，向 gin.Context 注入一些公共的前缀字段
+// Context 是一个中间件，向 gin.Context 注入 日志需要的字段信息，以实现调用链追踪
 func Context() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		ctx.Set("requestId", ctx.GetString(XRequestIdKey))
-		ctx.Set("username", ctx.GetString(UsernameKey))
+		ctx.Set(logger.KeyRequestID, ctx.GetString(KeyXRequestID))
+		ctx.Set(logger.KeyUsername, ctx.GetString(KeyUsername))
 		ctx.Next()
 	}
 }

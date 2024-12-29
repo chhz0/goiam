@@ -5,6 +5,8 @@ import (
 
 	"github.com/chhz0/goiam/internal/apisvr/config"
 	"github.com/chhz0/goiam/internal/apisvr/options"
+	"github.com/chhz0/goiam/internal/pkg/logger"
+	"github.com/chhz0/goiam/pkg/log"
 	"github.com/chhz0/goiam/pkg/simplecobra"
 )
 
@@ -27,6 +29,8 @@ func New() *simplecobra.Executor {
 
 func run(opts *options.APIServerOptions) func(ctx context.Context, args []string) error {
 	return func(ctx context.Context, args []string) error {
+		logger.NewLogger()
+		defer log.Sync()
 
 		cfg, err := config.NewConfigWithOptions(opts)
 		if err != nil {

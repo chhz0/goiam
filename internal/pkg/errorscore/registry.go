@@ -34,11 +34,11 @@ func (e *errorsNo) Any() any { return e.AnyData }
 var codeRegistry = make(map[int]ErrorsCoder, 0)
 var codeMutex = sync.Mutex{}
 
-func registerE(errorsCoder ErrorsCoder) {
-	codeMutex.Lock()
-	defer codeMutex.Unlock()
-	codeRegistry[errorsCoder.Code()] = errorsCoder
-}
+// func registerE(errorsCoder ErrorsCoder) {
+// 	codeMutex.Lock()
+// 	defer codeMutex.Unlock()
+// 	codeRegistry[errorsCoder.Code()] = errorsCoder
+// }
 
 func mustRegister(errorsCoder ErrorsCoder) {
 	codeMutex.Lock()

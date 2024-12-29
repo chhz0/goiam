@@ -26,3 +26,6 @@ go.work.sum
 
 config/certs/
 example/
+*.log
+deploy/docker-data/mariadb/data_*
+deploy/docker-data/mongodb/*

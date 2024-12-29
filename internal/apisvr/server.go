@@ -1,7 +1,10 @@
 package apisvr
 
 import (
+	"log"
+
 	"github.com/chhz0/goiam/internal/apisvr/config"
+	"github.com/chhz0/goiam/internal/apisvr/dal/mysql"
 	"github.com/chhz0/goiam/internal/pkg/ginserver"
 	"github.com/chhz0/goiam/pkg/graceful"
 	"github.com/chhz0/goiam/pkg/graceful/shutdownmanagers/posixsignal"
@@ -10,6 +13,7 @@ import (
 type apiServer struct {
 	gracefulShutdown *graceful.GracefulShutdown
 	ginServer        *ginserver.Server
+	grpcServer       *grpcServer
 	// todo redisServer gRPCServer
 }
 
@@ -64,9 +68,14 @@ func (s *apiServer) PreRun() *preApiServer {
 	initRouter(s.ginServer.Engine)
 
 	s.gracefulShutdown.AddShutdownCallback(graceful.OnShutdownFunc(func(str string) error {
-		// todo 关闭mysql、grpc
+		mysqlStore, _ := mysql.GetMysqlFactoryOr(nil)
+		if mysqlStore != nil {
+			_ = mysqlStore.Close()
+		}
 
-		s.ginServer.Shutdown()
+		s.grpcServer.Close()
+
+		_ = s.ginServer.Shutdown()
 
 		return nil
 	}))
@@ -79,9 +88,10 @@ type preApiServer struct {
 }
 
 func (s *preApiServer) Run() error {
+	go s.grpcServer.Run()
 
 	if err := s.gracefulShutdown.Start(); err != nil {
-		panic(err)
+		log.Fatalf("start shutdown manager failed: %v", err)
 	}
 
 	return s.ginServer.Run()

@@ -1,7 +1,7 @@
 package apisvr
 
 import (
-	"github.com/chhz0/goiam/internal/pkg/constants/errorsno"
+	"github.com/chhz0/goiam/internal/pkg/errorscore/errorno"
 	"github.com/chhz0/goiam/internal/pkg/httpcore"
 	"github.com/chhz0/goiam/internal/pkg/middleware/auth"
 	"github.com/chhz0/goiam/pkg/errors"
@@ -24,7 +24,7 @@ func installHandler(g *gin.Engine) {
 	auto := newAutoAuth()
 	g.NoRoute(auto.AuthFunc(), func(ctx *gin.Context) {
 		httpcore.WriteResponse(ctx,
-			errors.WithCodef(errorsno.ErrPageNotFound, "Page not found."),
+			errors.WithCodef(errorno.ErrPageNotFound, "Page not found."),
 			nil,
 		)
 	})

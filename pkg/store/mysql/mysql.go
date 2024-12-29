@@ -16,13 +16,14 @@ type Options struct {
 	Password  string
 	Databasse string
 
-	MaxIdleConns int
-	MaxOpenConns int
-	MaxConnLifeTime  time.Duration
-	MaxIdleTime  time.Duration
+	MaxIdleConns    int
+	MaxOpenConns    int
+	MaxConnLifeTime time.Duration
+	MaxIdleTime     time.Duration
 
-	LogLevel int
-	Logger   logger.Interface
+	LogLevel          int
+	Logger            logger.Interface
+	AutoMigrateTables []any
 }
 
 // NewMySQLClient 初始化MySQL客户端
@@ -32,10 +33,17 @@ func NewMySQLClient(opts *Options) (*gorm.DB, error) {
 	)
 
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: opts.Logger,
+		// Logger: opts.Logger,
 	})
 	if err != nil {
 		return nil, err
+	}
+
+	if len(opts.AutoMigrateTables) > 0 {
+		err = db.AutoMigrate(opts.AutoMigrateTables...)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	sqlDB, err := db.DB()
@@ -46,7 +54,7 @@ func NewMySQLClient(opts *Options) (*gorm.DB, error) {
 	sqlDB.SetMaxIdleConns(opts.MaxIdleConns)
 	sqlDB.SetMaxOpenConns(opts.MaxOpenConns)
 	sqlDB.SetConnMaxLifetime(opts.MaxConnLifeTime)
-	sqlDB.SetConnMaxIdleTime(opts.MaxIdleTime)
+	// sqlDB.SetConnMaxIdleTime(opts.MaxIdleTime)
 
 	return db, nil
 }

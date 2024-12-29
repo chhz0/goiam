@@ -29,6 +29,11 @@ jwt:
   timeout: 24h # JWT 认证的过期时间
   max-refresh: 24h # JWT 认证的刷新时间
 
+grpc:
+  bind-address: 127.0.0.1
+  bind-port: 5000
+  max-msg-size: 1024
+
 # server feature 配置 是一些监控
 feature:
   enable-profiling: false
@@ -44,3 +49,6 @@ mysql:
   max-open-conns: 100 # MySQL 最大打开的连接数，默认 100
   max-conn-life-time: 10s # 空闲连接最大存活时间，默认 10s
   log-level: 4 # GORM log level, 1: silent, 2:error, 3:warn, 4:info
+
+# 日志配置
+log:

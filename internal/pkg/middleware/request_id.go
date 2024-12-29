@@ -5,20 +5,20 @@ import (
 	"github.com/google/uuid"
 )
 
-// XRequestIdKey 请求ID
-const XRequestIdKey = "X-Request-ID"
+// KeyXRequestID 请求ID
+const KeyXRequestID = "X-Request-ID"
 
 func RequestId() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		rid := ctx.GetHeader(XRequestIdKey)
+		rid := ctx.GetHeader(KeyXRequestID)
 
 		if rid == "" {
 			rid = uuid.Must(uuid.NewRandom()).String()
-			ctx.Request.Header.Set(XRequestIdKey, rid)
-			ctx.Set(XRequestIdKey, rid)
+			ctx.Request.Header.Set(KeyXRequestID, rid)
+			ctx.Set(KeyXRequestID, rid)
 		}
 
-		ctx.Writer.Header().Set(XRequestIdKey, rid)
+		ctx.Writer.Header().Set(KeyXRequestID, rid)
 		ctx.Next()
 	}
 }
