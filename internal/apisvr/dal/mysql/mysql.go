@@ -16,7 +16,11 @@ type dbStore struct {
 }
 
 func (ds *dbStore) Users() dal.UserSDal {
-	return newUsers(ds.db)
+	return newUsers(ds)
+}
+
+func (ds *dbStore) Policies() dal.PolicyDal {
+	return newPolicies(ds)
 }
 
 // Close implements dal.Factory.

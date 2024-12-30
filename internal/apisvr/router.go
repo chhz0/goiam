@@ -1,6 +1,8 @@
 package apisvr
 
 import (
+	"github.com/chhz0/goiam/internal/apisvr/dal/mysql"
+	"github.com/chhz0/goiam/internal/apisvr/handler/v1/policy"
 	"github.com/chhz0/goiam/internal/pkg/errorscore/errorno"
 	"github.com/chhz0/goiam/internal/pkg/httpcore"
 	"github.com/chhz0/goiam/internal/pkg/middleware/auth"
@@ -29,6 +31,7 @@ func installHandler(g *gin.Engine) {
 		)
 	})
 
+	mysqlIns, _ := mysql.GetMysqlFactoryOr(nil)
 	v1 := g.Group("/v1")
 	{
 		// 用户接口
@@ -46,7 +49,9 @@ func installHandler(g *gin.Engine) {
 		// 策略接口
 		policyv1 := v1.Group("/policies")
 		{
-			policyv1.POST("")
+			policyHandler := policy.NewPolicyHandler(mysqlIns)
+
+			policyv1.POST("", policyHandler.Create)
 		}
 
 		// 密钥接口

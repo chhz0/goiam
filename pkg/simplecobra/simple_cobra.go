@@ -39,6 +39,7 @@ type Commander interface {
 
 // Flags 实现标志的接口
 // 注意：你应该返回各函数返回值的空值，而不是 nil
+// todo: 添加参数验证
 type Flags interface {
 	// PersistentFlags 持久化的标志
 	PersistentFlagsAndRequired() (fs *pflag.FlagSet, required []string)

@@ -18,3 +18,5 @@ const (
 	ErrSignatureInvalid int = iota + 100201
 	ErrInvalidAuthHeader
 )
+
+const ErrDatabase int = iota + 100101

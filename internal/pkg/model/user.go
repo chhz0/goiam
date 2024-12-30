@@ -3,7 +3,9 @@ package model
 import (
 	"time"
 
+	"github.com/chhz0/goiam/internal/pkg/utils/idutil"
 	"github.com/chhz0/goiam/pkg/meta"
+	"gorm.io/gorm"
 )
 
 type User struct {
@@ -28,4 +30,22 @@ type User struct {
 
 func (u *User) TableName() string {
 	return "user"
+}
+
+func (u *User) Compare(pwd string) error {
+	// todo 对pwd进行加密，后与u.Password进行对比
+
+	return nil
+}
+
+func (u *User) AfterCreate(tx *gorm.DB) (err error) {
+	u.InstanceID = idutil.GenerateInstanceID(u.TableName(), u.ID, "user-")
+
+	return tx.Save(u).Error
+}
+
+type UserList struct {
+	meta.ListMeta `json:",inline"`
+
+	Items []*User `json:"items"`
 }

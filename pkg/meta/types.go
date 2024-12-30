@@ -63,14 +63,21 @@ type ObjectMeta struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty" gorm:"column:updated_at;type:timestamp;autoUpdateTime"`
 }
 
-
-
+// BeforeCreate 在创建资源时，将扩展字段转换为JSON字符串
 func (o *ObjectMeta) BeforeCreate(tx *gorm.DB) (err error) {
 	o.ExtenShadow = o.ExtenAttrs.String()
 
 	return nil
 }
 
+// BeforeUpdate 在更新资源时，将扩展字段转换为JSON字符串
+func (o *ObjectMeta) BeforeUpdate(tx *gorm.DB) (err error) {
+	o.ExtenShadow = o.ExtenAttrs.String()
+
+	return nil
+}
+
+// AfterFind 在查询资源时，将JSON字符串转换为扩展字段
 func (o *ObjectMeta) AfterFind(tx *gorm.DB) (err error) {
 	if err := json.Unmarshal([]byte(o.ExtenShadow), &o.ExtenAttrs); err != nil {
 		return err

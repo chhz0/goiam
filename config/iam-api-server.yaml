@@ -32,7 +32,7 @@ jwt:
 grpc:
   bind-address: 127.0.0.1
   bind-port: 5000
-  max-msg-size: 1024
+  # max-msg-size: 1024
 
 # server feature 配置 是一些监控
 feature:

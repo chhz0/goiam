@@ -4,6 +4,7 @@ var client Factory
 
 type Factory interface {
 	Users() UserSDal
+	Policies() PolicyDal
 	Close() error
 }
 
