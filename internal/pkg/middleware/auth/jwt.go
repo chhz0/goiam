@@ -12,11 +12,6 @@ type JWTStrategy struct {
 	ginjwt.GinJWTMiddleware
 }
 
-// // AuthFunc implements middleware.AuthStrategy.
-// func (j JWTStrategy) AuthFunc() gin.HandlerFunc {
-// 	panic("unimplemented")
-// }
-
 func NewJWTStrategy(gjwt ginjwt.GinJWTMiddleware) JWTStrategy {
 	return JWTStrategy{gjwt}
 }

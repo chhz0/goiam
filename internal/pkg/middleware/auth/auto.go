@@ -3,7 +3,7 @@ package auth
 import (
 	"strings"
 
-	"github.com/chhz0/goiam/internal/pkg/errorscore/errorno"
+	errcode "github.com/chhz0/goiam/internal/pkg/errorscore/code"
 	"github.com/chhz0/goiam/internal/pkg/httpcore"
 	"github.com/chhz0/goiam/internal/pkg/middleware"
 	"github.com/chhz0/goiam/pkg/errors"
@@ -15,23 +15,23 @@ type AutoStrategy struct {
 	jwt   middleware.AuthStrategy
 }
 
-type withStrategy func(AutoStrategy)
+type withStrategy func(*AutoStrategy)
 
 func WithBasicStrategy(basic middleware.AuthStrategy) withStrategy {
-	return func(as AutoStrategy) {
+	return func(as *AutoStrategy) {
 		as.basic = basic
 	}
 }
 
 func WithJWTStrategy(jwt middleware.AuthStrategy) withStrategy {
-	return func(as AutoStrategy) {
+	return func(as *AutoStrategy) {
 		as.jwt = jwt
 	}
 }
 
 // NewAutoStrategyWith returns a new AutoStrategy with given strategies.
-func NewAutoStrategyWith(strategies ...withStrategy) AutoStrategy {
-	auto := AutoStrategy{}
+func NewAutoStrategyWith(strategies ...withStrategy) *AutoStrategy {
+	auto := &AutoStrategy{}
 
 	for _, sg := range strategies {
 		sg(auto)
@@ -53,7 +53,7 @@ func (a AutoStrategy) AuthFunc() gin.HandlerFunc {
 
 		if len(authHeader) != 2 {
 			httpcore.WriteResponse(ctx,
-				errors.WithCodef(errorno.ErrInvalidAuthHeader, "Authorization header format is wrong."),
+				errors.WithCodef(errcode.ErrInvalidAuthHeader, "Authorization header format is wrong."),
 				nil,
 			)
 			ctx.Abort()
@@ -68,7 +68,7 @@ func (a AutoStrategy) AuthFunc() gin.HandlerFunc {
 			operation.SetStrategy(a.jwt)
 		default:
 			httpcore.WriteResponse(ctx,
-				errors.WithCodef(errorno.ErrSignatureInvalid, "unrecognized Authorization header."),
+				errors.WithCodef(errcode.ErrSignatureInvalid, "unrecognized Authorization header."),
 				nil,
 			)
 			ctx.Abort()

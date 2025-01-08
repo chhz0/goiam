@@ -4,7 +4,7 @@ import (
 	"encoding/base64"
 	"strings"
 
-	"github.com/chhz0/goiam/internal/pkg/errorscore/errorno"
+	errcode "github.com/chhz0/goiam/internal/pkg/errorscore/code"
 	"github.com/chhz0/goiam/internal/pkg/httpcore"
 	"github.com/chhz0/goiam/internal/pkg/middleware"
 	"github.com/chhz0/goiam/pkg/errors"
@@ -26,7 +26,7 @@ func (b BasicStrategy) AuthFunc() gin.HandlerFunc {
 
 		if len(basic) != 2 || basic[0] != "Basic" {
 			httpcore.WriteResponse(ctx,
-				errors.WithCodef(errorno.ErrSignatureInvalid, "Authorization header format is wrong."),
+				errors.WithCodef(errcode.ErrSignatureInvalid, "Authorization header format is wrong."),
 				nil,
 			)
 
@@ -39,7 +39,7 @@ func (b BasicStrategy) AuthFunc() gin.HandlerFunc {
 
 		if len(pair) != 2 || !b.compare(pair[0], pair[1]) {
 			httpcore.WriteResponse(ctx,
-				errors.WithCodef(errorno.ErrSignatureInvalid, "Authorization header format is wrong."),
+				errors.WithCodef(errcode.ErrSignatureInvalid, "Authorization header format is wrong."),
 				nil,
 			)
 			ctx.Abort()
