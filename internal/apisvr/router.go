@@ -3,7 +3,8 @@ package apisvr
 import (
 	"github.com/chhz0/goiam/internal/apisvr/dal/mysql"
 	"github.com/chhz0/goiam/internal/apisvr/handler/v1/policy"
-	"github.com/chhz0/goiam/internal/pkg/errorscore/errorno"
+	"github.com/chhz0/goiam/internal/apisvr/handler/v1/user"
+	errcode "github.com/chhz0/goiam/internal/pkg/errorscore/code"
 	"github.com/chhz0/goiam/internal/pkg/httpcore"
 	"github.com/chhz0/goiam/internal/pkg/middleware/auth"
 	"github.com/chhz0/goiam/pkg/errors"
@@ -11,12 +12,13 @@ import (
 )
 
 func initRouter(g *gin.Engine) {
-
+	initMiddlewares(g)
+	initHandler(g)
 }
 
-func installMiddlewares(g *gin.Engine) {}
+func initMiddlewares(g *gin.Engine) {}
 
-func installHandler(g *gin.Engine) {
+func initHandler(g *gin.Engine) {
 
 	jwtStrategy, _ := newJWTAuth().(auth.JWTStrategy)
 	g.POST("/login", jwtStrategy.LoginHandler)
@@ -26,7 +28,7 @@ func installHandler(g *gin.Engine) {
 	auto := newAutoAuth()
 	g.NoRoute(auto.AuthFunc(), func(ctx *gin.Context) {
 		httpcore.WriteResponse(ctx,
-			errors.WithCodef(errorno.ErrPageNotFound, "Page not found."),
+			errors.WithCodef(errcode.ErrPageNotFound, "Page not found."),
 			nil,
 		)
 	})
@@ -37,7 +39,10 @@ func installHandler(g *gin.Engine) {
 		// 用户接口
 		userv1 := v1.Group("/users")
 		{
-			userv1.POST("")
+			userv1.Use(auto.AuthFunc())
+
+			userHandler := user.NewUserHandler(mysqlIns)
+			userv1.POST("", userHandler.Create)
 			userv1.DELETE("")
 			userv1.DELETE("/:name")
 			userv1.PUT(":name/change-password")
@@ -49,6 +54,8 @@ func installHandler(g *gin.Engine) {
 		// 策略接口
 		policyv1 := v1.Group("/policies")
 		{
+			policyv1.Use(auto.AuthFunc())
+
 			policyHandler := policy.NewPolicyHandler(mysqlIns)
 
 			policyv1.POST("", policyHandler.Create)
@@ -57,6 +64,8 @@ func installHandler(g *gin.Engine) {
 		// 密钥接口
 		secretv1 := v1.Group("/secrets")
 		{
+			secretv1.Use(auto.AuthFunc())
+
 			secretv1.POST("")
 		}
 	}

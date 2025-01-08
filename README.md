@@ -8,7 +8,7 @@ An identity and access management service built with the Go language.
 >
 > 例如，本项目的应用构建是使用`chhz0/gosimplecobra`，这是自己实现的一个简易命令行工具，功能上比`marmotedu/iam`下的`pkg/app`应用构建工具要简单。建议参考使用`marmotedu/iam`下的`pkg/app`应用构建工具。
 >
-> 此外，还会由不同的其它实现，例如`log`,`errorno`等，但大部分代码将参考`marmotedu/iam`下的实现。
+> 此外，还会由不同的其它实现，例如`log`,`errcode`等，但大部分代码将参考`marmotedu/iam`下的实现。
 
 ## 组件
 核心组件：

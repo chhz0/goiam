@@ -6,11 +6,17 @@ import (
 )
 
 type Service interface {
+	Users() v1.UserSrv
 	Policies() v1.PolicySrv
 }
 
 type service struct {
 	factory dal.Factory
+}
+
+// Users implements Service.
+func (s *service) Users() v1.UserSrv {
+	return v1.NewUsers(s.factory)
 }
 
 // Policies implements Service.

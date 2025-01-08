@@ -14,11 +14,7 @@ type apiServer struct {
 	gracefulShutdown *graceful.GracefulShutdown
 	ginServer        *ginserver.Server
 	grpcServer       *grpcServer
-	// todo redisServer gRPCServer
-}
-
-// todo 添加额外配置
-type ExtraConfig struct {
+	// TODO redisServer gRPCServer
 }
 
 func newAPIServer(cfg *config.Config) (*apiServer, error) {

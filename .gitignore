@@ -29,3 +29,7 @@ example/
 *.log
 deploy/docker-data/mariadb/data_*
 deploy/docker-data/mongodb/*
+
+# vscode
+.vscode/
+.cache/

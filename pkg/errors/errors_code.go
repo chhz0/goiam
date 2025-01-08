@@ -50,7 +50,7 @@ func (w *withCode) Error() string {
 	return fmt.Sprintf(format, w.code, w.error.Error())
 }
 
-// todo : 1.支持json格式输出  2.修改输出格式 3. 支持 %-v 输出最近的错误调用 4. 支持 %+v 输出所有的错误调用
+// TODO : 1.支持json格式输出  2.修改输出格式 3. 支持 %-v 输出最近的错误调用 4. 支持 %+v 输出所有的错误调用
 func (w *withCode) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 'v':

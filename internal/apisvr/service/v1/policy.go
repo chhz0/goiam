@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/chhz0/goiam/internal/apisvr/dal"
-	"github.com/chhz0/goiam/internal/pkg/errorscore/errorno"
+	errcode "github.com/chhz0/goiam/internal/pkg/errorscore/code"
 	"github.com/chhz0/goiam/internal/pkg/model"
 	"github.com/chhz0/goiam/pkg/errors"
 	"github.com/chhz0/goiam/pkg/meta"
@@ -26,7 +26,7 @@ type policyService struct {
 // Create implements PolicySrv.
 func (p *policyService) Create(ctx context.Context, policy *model.Policy, opts meta.CreateOptions) error {
 	if err := p.dal.Policies().Create(ctx, policy, opts); err != nil {
-		return errors.WithCode(errorno.ErrDatabase, err)
+		return errors.WithCode(errcode.ErrDatabase, err)
 	}
 
 	return nil

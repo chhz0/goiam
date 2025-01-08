@@ -18,7 +18,7 @@ func WriteResponse(ctx *gin.Context, err error, data any) {
 	if err != nil {
 		coder := errorscore.ParseErrorToCoder(err)
 
-		// todo any的类型转换
+		// TODO any的类型转换
 		var ref string
 		var ok bool
 		if coder.Any() != nil {

@@ -12,8 +12,8 @@ services:
     ports:
       - 13306:3306
     volumes:
-      - ./deploy/docker-data/mariadb/data_1:/var/lib/mysql:rw
-      - ./deploy/docker-data/mariadb/sql:/docker-entrypoint-initdb.d
+      # - ./deploy/docker-data/mariadb/data_1:/var/lib/mysql:rw
+      # - ./deploy/docker-data/mariadb/sql:/docker-entrypoint-initdb.d
 
 
   # adminer:

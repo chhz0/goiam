@@ -54,7 +54,7 @@ func (s *Server) installAPIs() {
 			})
 		})
 	}
-	// todo: enable prometheus and pprof handler
+	// TODO: enable prometheus and pprof handler
 
 	s.GET("/version", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{

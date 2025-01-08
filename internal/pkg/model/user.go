@@ -1,10 +1,13 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
+	"github.com/chhz0/goiam/internal/pkg/utils/authutil"
 	"github.com/chhz0/goiam/internal/pkg/utils/idutil"
 	"github.com/chhz0/goiam/pkg/meta"
+	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
 
@@ -33,8 +36,15 @@ func (u *User) TableName() string {
 }
 
 func (u *User) Compare(pwd string) error {
-	// todo 对pwd进行加密，后与u.Password进行对比
+	if err := authutil.Compare(u.Password, pwd); err != nil {
+		return fmt.Errorf("failed to compare password: %w", err)
+	}
+	return nil
+}
 
+func (u *User) Validata() error {
+	// TODO: 支持参数验证
+	validator.New(validator.WithRequiredStructEnabled())
 	return nil
 }
 

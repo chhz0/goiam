@@ -39,7 +39,7 @@ type Commander interface {
 
 // Flags 实现标志的接口
 // 注意：你应该返回各函数返回值的空值，而不是 nil
-// todo: 添加参数验证
+// TODO: 添加参数验证
 type Flags interface {
 	// PersistentFlags 持久化的标志
 	PersistentFlagsAndRequired() (fs *pflag.FlagSet, required []string)
@@ -54,9 +54,9 @@ type RootCommand struct {
 	Long    string
 
 	Version string
-	// todo: 添加自定义的help
+	// TODO: 添加自定义的help
 	Help string
-	// todo: 启动默认的config && 绑定到子命令的标志
+	// TODO: 启动默认的config && 绑定到子命令的标志
 	EnableConf bool
 	Cfg        string
 
@@ -179,7 +179,7 @@ func WithRunFunc(runF func(ctx context.Context, args []string) error) RootOption
 	}
 }
 
-// todo: 默认配置文件，和传进配置文件之间存在冲突
+// TODO: 默认配置文件，和传进配置文件之间存在冲突
 func (rc *RootCommand) loadConfig(cfg string) {
 	rc.rootCobra.Flags().StringVarP(&cfgFile, "config", "c", cfg, "config file (default is $HOME/.simple/config.yaml")
 	cobra.OnInitialize(DefaultInitConfigFunc)
