@@ -37,7 +37,6 @@ func (ls Set) String() string {
 	return strings.Join(selector, ",")
 }
 
-// todo set 转换为 selector
-func (ls Set) AsSelector() string {
-	return ""
+func (ls Set) AsSelector() Selector {
+	return SelectorFromSet(ls)
 }
