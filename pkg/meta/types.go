@@ -94,6 +94,7 @@ type ListOptions struct {
 	LabelSelector string `json:"labelSelector,omitempty"`
 
 	// FieldSelector 用以查找到匹配的 REST 资源, 默认为 所有.
+	// 对应数据库中的表字段
 	FieldSelector string `json:"fieldSelector,omitempty"`
 
 	TimeoutSeconds *int64 `json:"timeoutSeconds,omitempty"`

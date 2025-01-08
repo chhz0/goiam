@@ -1,7 +1,9 @@
 package fields
 
 import (
+	"bytes"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/chhz0/goiam/pkg/meta/selection"
@@ -92,7 +94,7 @@ func (h *hasTerm) Requirements() Requirements {
 }
 
 func (h *hasTerm) String() string {
-	return fmt.Sprintf("%v=%v", h.field, EscapeValue(h.value))
+	return fmt.Sprintf("%v=%v", h.field, escapeValue(h.value))
 }
 
 func (h *hasTerm) DeepCopy() Selector {
@@ -143,7 +145,7 @@ func (h *notHasTerm) Requirements() Requirements {
 }
 
 func (h *notHasTerm) String() string {
-	return fmt.Sprintf("%v!=%v", h.field, EscapeValue(h.value))
+	return fmt.Sprintf("%v!=%v", h.field, escapeValue(h.value))
 }
 
 func (h *notHasTerm) DeepCopy() Selector {
@@ -272,6 +274,154 @@ func SelectorFromSet(ls Set) Selector {
 	return andTerm(terms)
 }
 
-func EscapeValue(rStr string) string {
+// escapeValue 将给定的字符串中的特殊字符进行转义，以避免在数据库查询中引起错误
+func escapeValue(rStr string) string {
 	return strings.NewReplacer(`\`, `\\`, `,`, `\,`, `=`, `\=`).Replace(rStr)
+}
+
+const (
+	notEqualOp    = "!="
+	equalOp       = "="
+	doubleEqualOp = "=="
+)
+
+var termOperators = []string{notEqualOp, equalOp, doubleEqualOp}
+
+func ParseSelector(selector string) (Selector, error) {
+	return parseSelector(selector,
+		func(field, value string) (newField string, newValue string, err error) {
+			return field, value, nil
+		},
+	)
+}
+
+func ParseAndTransformSelector(selector string, fn TransformFunc) (Selector, error) {
+	return parseSelector(selector, fn)
+}
+
+func parseSelector(selector string, fn TransformFunc) (Selector, error) {
+	parts := splitTerms(selector)
+	sort.StringSlice(parts).Sort()
+	var items []Selector
+
+	for _, p := range parts {
+		if p == "" {
+			continue
+		}
+		lhs, op, rhs, ok := splitTerm(p)
+		if !ok {
+			return nil, fmt.Errorf("invalid selector: '%s'; can't split term: '%s'", selector, p)
+		}
+		unescapedRHS, err := unescapeValue(rhs)
+		if err != nil {
+			return nil, err
+		}
+		switch op {
+		case notEqualOp:
+			items = append(items, &notHasTerm{field: lhs, value: unescapedRHS})
+		case doubleEqualOp:
+			items = append(items, &hasTerm{field: lhs, value: unescapedRHS})
+		case equalOp:
+			items = append(items, &hasTerm{field: lhs, value: unescapedRHS})
+		default:
+			return nil, fmt.Errorf("invalid selector: '%s'; can't understand value: '%s'", selector, p)
+		}
+	}
+	if len(items) == 1 {
+		return items[0].Transform(fn)
+	}
+
+	return andTerm(items).Transform(fn)
+}
+
+// splitTerms 将给定的字符串按逗号分隔成多个子字符串
+// 这些子字符串用于在数据库查询、过滤或其他类似的场景中指定条件
+func splitTerms(fieldSelector string) []string {
+	if len(fieldSelector) == 0 {
+		return nil
+	}
+
+	terms := make([]string, 0, 1)
+	startIdx := 0
+	inSlash := false
+	for i, c := range fieldSelector {
+		switch {
+		case inSlash:
+			inSlash = false
+		case c == '\\':
+			inSlash = true
+		case c == ',':
+			terms = append(terms, fieldSelector[startIdx:i])
+			startIdx = i + 1
+		}
+	}
+
+	terms = append(terms, fieldSelector[startIdx:])
+
+	return terms
+}
+
+// splitTerm 将给定的字符串按运算符分割成三个子字符串:
+// lhs 表示左操作数，op 表示运算符，rhs 表示右操作数
+// 主要解析字段选择器中的条件表达式
+func splitTerm(term string) (lhs, op, rhs string, ok bool) {
+	for i := range term {
+		for _, op := range termOperators {
+			if strings.HasPrefix(term[i:], op) {
+				return term[:i], op, strings.TrimSpace(term[i+len(op):]), true
+			}
+		}
+	}
+
+	return "", "", "", false
+}
+
+// unescapeValue 从给定的字符串中去除转义字符，还原原始值
+func unescapeValue(str string) (string, error) {
+	if !strings.ContainsAny(str, `\,=`) {
+		return str, nil
+	}
+
+	buf := bytes.NewBuffer(make([]byte, 0, len(str)))
+	isSlash := false
+	for _, c := range str {
+		if isSlash {
+			switch c {
+			case '\\', ',', '=':
+				buf.WriteRune(c)
+			default:
+				return "", fmt.Errorf("invalid selector: '%s'; unrecognized escape sequence: '\\%c'", str, c)
+			}
+			isSlash = false
+			continue
+		}
+
+		switch c {
+		case '\\':
+			isSlash = true
+		case ',', '=':
+			return "", fmt.Errorf("invalid selector: '%s'; unexpected character: '%c'", str, c)
+		default:
+			buf.WriteRune(c)
+		}
+
+	}
+
+	if isSlash {
+		return "", fmt.Errorf("invalid selector: '%s'; unrecognized escape sequence: '\\'", str)
+	}
+
+	return buf.String(), nil
+}
+
+func OneTermEqualSelector(f, v string) Selector {
+	return &hasTerm{f, v}
+}
+
+func OneTermNotEqualSelector(f, v string) Selector {
+	return &notHasTerm{f, v}
+}
+
+func AndTerm(selectors ...Selector) Selector {
+	return andTerm(selectors)
 }
