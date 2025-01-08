@@ -33,3 +33,7 @@ Kubernetes REST资源的设计遵循统一的资源数据模型，这使得不�
    所有的操作都是无状态的，这意味着每个请求都包含了完成该操作所需的所有信息，不需要服务器保存客户端状态。
 
 通过这种设计，Kubernetes确保了资源对象的一致性和可预测性，同时也提供了灵活的资源管理和操作方式。这种设计模式使得Kubernetes的API易于理解和使用，同时也方便了自动化和工具的开发。
+
+## 参考
+
+[component-base](https://github.com/marmotedu/component-base/pkg/fields)

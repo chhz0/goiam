@@ -79,7 +79,7 @@ func (h *hasTerm) Transform(f TransformFunc) (Selector, error) {
 	}
 
 	if len(field) == 0 && len(value) == 0 {
-		return nil, nil
+		return Everything(), nil
 	}
 
 	return &hasTerm{field, value}, nil
@@ -130,7 +130,7 @@ func (h *notHasTerm) Transform(f TransformFunc) (Selector, error) {
 	}
 
 	if len(field) == 0 && len(value) == 0 {
-		return nil, nil
+		return Everything(), nil
 	}
 
 	return &notHasTerm{field, value}, nil
@@ -176,11 +176,10 @@ func (at andTerm) Matches(ls Fields) bool {
 // Empty implements Selector.
 func (at andTerm) Empty() bool {
 	if at == nil {
-		return false
+		return true
 	}
 
-	// TODO: len([]Selector(at)) == 0
-	if len(at) == 0 {
+	if len([]Selector(at)) == 0 {
 		return true
 	}
 	for _, s := range at {
@@ -194,7 +193,7 @@ func (at andTerm) Empty() bool {
 
 // RequiresExactMatch implements Selector.
 func (at andTerm) RequiresExactMatch(field string) (value string, found bool) {
-	if at.Empty() || len(at) == 0 {
+	if at.Empty() || len([]Selector(at)) == 0 {
 		return "", false
 	}
 	for _, s := range at {
@@ -207,10 +206,10 @@ func (at andTerm) RequiresExactMatch(field string) (value string, found bool) {
 }
 
 // Transform implements Selector.
-func (at andTerm) Transform(TransformFunc) (Selector, error) {
+func (at andTerm) Transform(fn TransformFunc) (Selector, error) {
 	new := make([]Selector, 0, len(at))
 	for _, s := range at {
-		newS, err := s.Transform(nil)
+		newS, err := s.Transform(fn)
 		if err != nil {
 			return nil, err
 		}
@@ -272,6 +271,24 @@ func SelectorFromSet(ls Set) Selector {
 	}
 
 	return andTerm(terms)
+}
+
+// InvalidEscapeSequence indicates an error occurred unescaping a field selector.
+type InvalidEscapeSequence struct {
+	sequence string
+}
+
+func (i InvalidEscapeSequence) Error() string {
+	return fmt.Sprintf("invalid field selector: invalid escape sequence: %s", i.sequence)
+}
+
+// UnescapedRune indicates an error occurred unescaping a field selector.
+type UnescapedRune struct {
+	r rune
+}
+
+func (i UnescapedRune) Error() string {
+	return fmt.Sprintf("invalid field selector: unescaped character in value: %v", i.r)
 }
 
 // escapeValue 将给定的字符串中的特殊字符进行转义，以避免在数据库查询中引起错误
@@ -368,7 +385,10 @@ func splitTerm(term string) (lhs, op, rhs string, ok bool) {
 	for i := range term {
 		for _, op := range termOperators {
 			if strings.HasPrefix(term[i:], op) {
-				return term[:i], op, strings.TrimSpace(term[i+len(op):]), true
+				if op == equalOp && term[i+1] == '=' {
+					op = doubleEqualOp
+				}
+				return term[:i], op, term[i+len(op):], true
 			}
 		}
 	}
@@ -390,7 +410,7 @@ func unescapeValue(str string) (string, error) {
 			case '\\', ',', '=':
 				buf.WriteRune(c)
 			default:
-				return "", fmt.Errorf("invalid selector: '%s'; unrecognized escape sequence: '\\%c'", str, c)
+				return "", InvalidEscapeSequence{sequence: string([]rune{'\\', c})}
 			}
 			isSlash = false
 			continue
@@ -400,7 +420,7 @@ func unescapeValue(str string) (string, error) {
 		case '\\':
 			isSlash = true
 		case ',', '=':
-			return "", fmt.Errorf("invalid selector: '%s'; unexpected character: '%c'", str, c)
+			return "", UnescapedRune{r: c}
 		default:
 			buf.WriteRune(c)
 		}
@@ -408,7 +428,7 @@ func unescapeValue(str string) (string, error) {
 	}
 
 	if isSlash {
-		return "", fmt.Errorf("invalid selector: '%s'; unrecognized escape sequence: '\\'", str)
+		return "", InvalidEscapeSequence{sequence: "\\"}
 	}
 
 	return buf.String(), nil
