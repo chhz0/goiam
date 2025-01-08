@@ -15,6 +15,16 @@ type dbStore struct {
 	db *gorm.DB
 }
 
+// PolicyAudits implements dal.Factory.
+func (ds *dbStore) PolicyAudits() dal.PolicyAuditDal {
+	return newPolicyAudits(ds)
+}
+
+// Secrets implements dal.Factory.
+func (ds *dbStore) Secrets() dal.SecretDal {
+	return newSecrets(ds)
+}
+
 func (ds *dbStore) Users() dal.UserSDal {
 	return newUsers(ds)
 }

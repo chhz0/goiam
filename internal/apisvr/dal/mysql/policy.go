@@ -4,11 +4,12 @@ import (
 	"context"
 
 	"github.com/chhz0/goiam/internal/apisvr/dal"
-	"github.com/chhz0/goiam/internal/pkg/errorscore/errorno"
+	errcode "github.com/chhz0/goiam/internal/pkg/errorscore/code"
 	"github.com/chhz0/goiam/internal/pkg/model"
 	"github.com/chhz0/goiam/internal/pkg/utils/gormutil"
 	"github.com/chhz0/goiam/pkg/errors"
 	"github.com/chhz0/goiam/pkg/meta"
+	"github.com/chhz0/goiam/pkg/meta/fields"
 	"gorm.io/gorm"
 )
 
@@ -29,7 +30,7 @@ func (p *policies) Delete(ctx context.Context, username string, name string, opt
 
 	err := p.db.Where("username = ? AND name = ?", username, name).Delete(&model.Policy{}).Error
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return errors.WithCode(errorno.ErrDatabase, err)
+		return errors.WithCode(errcode.ErrDatabase, err)
 	}
 
 	return nil
@@ -66,9 +67,9 @@ func (p *policies) Get(ctx context.Context, username string, name string, opts m
 	err := p.db.Where("username = ? AND name = ?", username, name).First(&policy).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.WithCode(errorno.ErrPolicyNotFound, err)
+			return nil, errors.WithCode(errcode.ErrPolicyNotFound, err)
 		}
-		return nil, errors.WithCode(errorno.ErrDatabase, err)
+		return nil, errors.WithCode(errcode.ErrDatabase, err)
 	}
 
 	return policy, nil
@@ -83,9 +84,10 @@ func (p *policies) List(ctx context.Context, username string, opts meta.ListOpti
 		p.db = p.db.Where("username = ?", username)
 	}
 
-	// todo : selector
+	selector, _ := fields.ParseSelector(opts.FieldSelector)
+	name, _ := selector.RequiresExactMatch("name")
 
-	d := p.db.Where("name like ?", "%"+opts.FieldSelector+"%").
+	d := p.db.Where("name like ?", "%"+name+"%").
 		Offset(ol.Offset).Limit(ol.Limit).Order("id desc").Find(&ret.Items).
 		Offset(-1).Limit(-1).Count(&ret.TotalCount)
 

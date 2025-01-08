@@ -4,7 +4,9 @@ var client Factory
 
 type Factory interface {
 	Users() UserSDal
+	Secrets() SecretDal
 	Policies() PolicyDal
+	PolicyAudits() PolicyAuditDal
 	Close() error
 }
 

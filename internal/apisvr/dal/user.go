@@ -13,5 +13,5 @@ type UserSDal interface {
 	Delete(ctx context.Context, username string, opts meta.DeleteOptions) error
 	DeleteCollection(ctx context.Context, username []string, opts meta.DeleteOptions) error
 	Get(ctx context.Context, username string, opts meta.GetOptions) (*model.User, error)
-	List(ctx context.Context, opts meta.ListOptions) ([]*model.UserList, error)
+	List(ctx context.Context, opts meta.ListOptions) (*model.UserList, error)
 }
