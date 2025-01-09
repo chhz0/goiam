@@ -1,2 +1,6 @@
 ### version get
 GET http://localhost:8080/version HTTP/1.1
+
+
+### https version get
+GET https://localhost:8443/version HTTP/1.1

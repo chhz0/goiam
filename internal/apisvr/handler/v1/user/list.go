@@ -3,6 +3,7 @@ package user
 import (
 	errcode "github.com/chhz0/goiam/internal/pkg/errorscore/code"
 	"github.com/chhz0/goiam/internal/pkg/httpcore"
+	"github.com/chhz0/goiam/internal/pkg/logger"
 	"github.com/chhz0/goiam/pkg/errors"
 	"github.com/chhz0/goiam/pkg/log"
 	"github.com/chhz0/goiam/pkg/meta"
@@ -10,7 +11,7 @@ import (
 )
 
 func (u *UserHandler) List(ctx *gin.Context) {
-	log.L(ctx).Info("user list function called.")
+	log.L(ctx, logger.UseKeys...).Info("user list function called.")
 
 	var r meta.ListOptions
 	if err := ctx.ShouldBindJSON(&r); err != nil {

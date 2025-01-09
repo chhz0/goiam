@@ -15,8 +15,8 @@ type BasicStrategy struct {
 	compare func(username, password string) bool
 }
 
-func NewBasicStrategy(compare func(username, password string) bool) *BasicStrategy {
-	return &BasicStrategy{compare: compare}
+func NewBasicStrategy(compare func(username, password string) bool) BasicStrategy {
+	return BasicStrategy{compare: compare}
 }
 
 // AuthFunc implements middleware.AuthStrategy.

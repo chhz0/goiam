@@ -41,7 +41,7 @@ feature:
 
 # MySQL 配置
 mysql:
-  host: localhost:3306 # 数据库地址
+  host: localhost:13306 # 数据库地址
   user: apiuser # 数据库用户名
   password: apipwd # 数据库密码
   database: iam # 数据库名称

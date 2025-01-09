@@ -9,10 +9,17 @@ import (
 )
 
 const (
-	KeyRequestID = "requestID"
-	KeyUserID    = "userID"
-	KeyUsername  = "username"
+	KeyRequestID = "RequestID"
+	KeyUserID    = "UserID"
+	KeyUsername  = "Username"
+	keyWathcer   = "Watcher"
 )
+
+var UseKeys = []string{
+	KeyRequestID,
+	KeyUsername,
+	keyWathcer,
+}
 
 func NewLogger() {
 	logOpts := []log.ZapOption{

@@ -34,27 +34,49 @@ func (p *policyService) Create(ctx context.Context, policy *model.Policy, opts m
 
 // Delete implements PolicySrv.
 func (p *policyService) Delete(ctx context.Context, username string, name string, opts meta.DeleteOptions) error {
-	panic("unimplemented")
+	if err := p.dal.Policies().Delete(ctx, username, name, opts); err != nil {
+		return errors.WithCode(errcode.ErrDatabase, err)
+	}
+
+	return nil
 }
 
 // DeleteCollection implements PolicySrv.
 func (p *policyService) DeleteCollection(ctx context.Context, username string, name []string, opts meta.DeleteOptions) error {
-	panic("unimplemented")
+	if err := p.dal.Policies().DeleteCollection(ctx, username, name, opts); err != nil {
+		return errors.WithCode(errcode.ErrDatabase, err)
+	}
+
+	return nil
 }
 
 // Get implements PolicySrv.
 func (p *policyService) Get(ctx context.Context, username string, name string, opts meta.GetOptions) (*model.Policy, error) {
-	panic("unimplemented")
+	policy, err := p.dal.Policies().Get(ctx, username, name, opts)
+	if err != nil {
+		return nil, errors.WithCode(errcode.ErrDatabase, err)
+	}
+
+	return policy, nil
 }
 
 // List implements PolicySrv.
 func (p *policyService) List(ctx context.Context, username string, opts meta.ListOptions) (*model.PolicyList, error) {
-	panic("unimplemented")
+	policies, err := p.dal.Policies().List(ctx, username, opts)
+	if err != nil {
+		return nil, errors.WithCode(errcode.ErrDatabase, err)
+	}
+
+	return policies, nil
 }
 
 // Update implements PolicySrv.
 func (p *policyService) Update(ctx context.Context, policy *model.Policy, opts meta.UpdateOptions) error {
-	panic("unimplemented")
+	if err := p.dal.Policies().Update(ctx, policy, opts); err != nil {
+		return errors.WithCode(errcode.ErrDatabase, err)
+	}
+
+	return nil
 }
 
 func NewPolicies(f dal.Factory) *policyService {

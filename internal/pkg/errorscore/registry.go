@@ -51,7 +51,7 @@ func mustRegister(errorsCoder ErrorsCoder) {
 	codeRegistry[errorsCoder.Code()] = errorsCoder
 }
 
-var allowHttpStauts = []int{200, 401, 403, 404, 500}
+var allowHttpStauts = []int{200, 400, 401, 403, 404, 500}
 
 func registerCode(code int, httpStauts int, msg string, refs ...string) {
 

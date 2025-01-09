@@ -12,24 +12,31 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (p *PolicyHandler) Create(ctx *gin.Context) {
-	log.L(ctx, logger.UseKeys...).Info("create policy function called.")
+func (p *PolicyHandler) Update(ctx *gin.Context) {
+	log.L(ctx, logger.UseKeys...).Info("update policy function called.")
 
 	var r model.Policy
 	if err := ctx.ShouldBindJSON(&r); err != nil {
 		httpcore.WriteResponse(ctx, errors.WithCode(errcode.ErrBind, err), nil)
-
 		return
 	}
 
-	// TODO validate
-
-	r.Username = ctx.GetString(middleware.KeyUsername)
-	if err := p.srv.Policies().Create(ctx, &r, meta.CreateOptions{}); err != nil {
+	pol, err := p.srv.Policies().Get(ctx, ctx.GetString(middleware.KeyUsername),
+		ctx.Param("name"), meta.GetOptions{})
+	if err != nil {
 		httpcore.WriteResponse(ctx, err, nil)
-
 		return
 	}
 
-	httpcore.WriteResponse(ctx, nil, r)
+	pol.Policy = r.Policy
+	pol.ExtenAttrs = r.ExtenAttrs
+
+	// TODO: validate
+
+	if err := p.srv.Policies().Update(ctx, pol, meta.UpdateOptions{}); err != nil {
+		httpcore.WriteResponse(ctx, err, nil)
+		return
+	}
+
+	httpcore.WriteResponse(ctx, nil, pol)
 }

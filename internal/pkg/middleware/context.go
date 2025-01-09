@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	KeyUsername = "username"
-	KeyUserID   = "userID"
+	KeyUsername = "Username"
+	KeyUserID   = "UserID"
 )
 
 // Context 是一个中间件，向 gin.Context 注入 日志需要的字段信息，以实现调用链追踪

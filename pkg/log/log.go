@@ -194,7 +194,7 @@ func (l *zapLogger) L(ctx context.Context, keys ...string) Logger {
 
 	for _, key := range keys {
 		if value := ctx.Value(key); value != nil {
-			l.l = l.l.With(zap.Any(key, value))
+			llog.l = llog.l.With(zap.Any(key, value))
 		}
 	}
 

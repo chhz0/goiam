@@ -32,10 +32,7 @@ func run(opts *options.APIServerOptions) func(ctx context.Context, args []string
 		logger.NewLogger()
 		defer log.Sync()
 
-		cfg, err := config.NewConfigWithOptions(opts)
-		if err != nil {
-			return err
-		}
+		cfg, _ := config.NewConfigWithOptions(opts)
 
 		return apiRun(cfg)
 	}

@@ -1,1 +1,24 @@
-GET http:// HTTP/1.1
+### login
+POST {{baseUrl}}/login HTTP/1.1
+Content-Type: application/json
+
+{
+    "username": "user1",
+    "password": "User@2025"
+}
+
+@user1Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJpYW0uYXBpLmhlbGxveHguY24iLCJleHAiOjE3MzY0NTI0NDUsImlkZW50aXR5IjoidXNlcjEiLCJpc3MiOiJpYW0tYXBpc3ZyIiwib3JpZ19pYXQiOjE3MzYzNjYwNDUsInN1YiI6InVzZXIxIn0.TZKpKeMd3_v5-ezw9HHyW4gXfJ31UgnveNtw_8lNEx0"
+
+### user create
+POST {{v1Url}}/users HTTP/1.1
+Content-Type: application/json
+
+{
+    "password": "User@2025",
+    "metadata": {
+        "name": "user1"
+    },
+    "nickname": "chhz0",
+    "email": "chhz0@qq.com",
+    "phone": "18888888888"
+}

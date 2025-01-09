@@ -11,7 +11,7 @@ services:
       MARIADB_DATABASE: iam
     ports:
       - 13306:3306
-    volumes:
+    # volumes:
       # - ./deploy/docker-data/mariadb/data_1:/var/lib/mysql:rw
       # - ./deploy/docker-data/mariadb/sql:/docker-entrypoint-initdb.d
 

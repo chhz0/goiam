@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/chhz0/goiam/internal/apisvr/dal"
+	"github.com/chhz0/goiam/internal/pkg/model"
 	"github.com/chhz0/goiam/internal/pkg/options"
 	"github.com/chhz0/goiam/pkg/errors"
 	"github.com/chhz0/goiam/pkg/store/mysql"
@@ -66,7 +67,11 @@ func GetMysqlFactoryOr(opts *options.MySQLOptions) (dal.Factory, error) {
 			// Logger:          logger.New(os.Stdout,&logger.Config{
 			// }),
 
-			AutoMigrateTables: []any{},
+			AutoMigrateTables: []any{
+				&model.User{},
+				&model.Policy{},
+				&model.Secret{},
+			},
 		}
 		db, err = mysql.NewMySQLClient(&mysqlOpts)
 

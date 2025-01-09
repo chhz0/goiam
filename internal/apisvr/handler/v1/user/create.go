@@ -5,6 +5,7 @@ import (
 
 	errcode "github.com/chhz0/goiam/internal/pkg/errorscore/code"
 	"github.com/chhz0/goiam/internal/pkg/httpcore"
+	"github.com/chhz0/goiam/internal/pkg/logger"
 	"github.com/chhz0/goiam/internal/pkg/model"
 	"github.com/chhz0/goiam/internal/pkg/utils/authutil"
 	"github.com/chhz0/goiam/pkg/errors"
@@ -14,7 +15,7 @@ import (
 )
 
 func (u *UserHandler) Create(ctx *gin.Context) {
-	log.L(ctx).Info("user create function called.")
+	log.L(ctx, logger.UseKeys...).Info("user create function called.")
 
 	var r model.User
 

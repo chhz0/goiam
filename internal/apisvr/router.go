@@ -3,6 +3,7 @@ package apisvr
 import (
 	"github.com/chhz0/goiam/internal/apisvr/dal/mysql"
 	"github.com/chhz0/goiam/internal/apisvr/handler/v1/policy"
+	"github.com/chhz0/goiam/internal/apisvr/handler/v1/secret"
 	"github.com/chhz0/goiam/internal/apisvr/handler/v1/user"
 	errcode "github.com/chhz0/goiam/internal/pkg/errorscore/code"
 	"github.com/chhz0/goiam/internal/pkg/httpcore"
@@ -33,40 +34,53 @@ func initHandler(g *gin.Engine) {
 		)
 	})
 
-	mysqlIns, _ := mysql.GetMysqlFactoryOr(nil)
+	mysqlIns, err := mysql.GetMysqlFactoryOr(nil)
+	if err != nil {
+		panic(err)
+	}
+
 	v1 := g.Group("/v1")
 	{
+
 		// 用户接口
 		userv1 := v1.Group("/users")
 		{
-			userv1.Use(auto.AuthFunc())
-
 			userHandler := user.NewUserHandler(mysqlIns)
+
 			userv1.POST("", userHandler.Create)
-			userv1.DELETE("")
-			userv1.DELETE("/:name")
-			userv1.PUT(":name/change-password")
-			userv1.PUT(":name")
-			userv1.GET("")
-			userv1.GET(":name")
+			userv1.Use(auto.AuthFunc())
+			userv1.DELETE("", userHandler.Delete)
+			userv1.DELETE("/:name", userHandler.DeleteCollection)
+			userv1.PUT(":name/change-password", userHandler.ChangePassword)
+			userv1.PUT(":name", userHandler.Update)
+			userv1.GET("", userHandler.List)
+			userv1.GET(":name", userHandler.Get)
 		}
 
+		v1.Use(auto.AuthFunc())
 		// 策略接口
 		policyv1 := v1.Group("/policies")
 		{
-			policyv1.Use(auto.AuthFunc())
-
 			policyHandler := policy.NewPolicyHandler(mysqlIns)
 
 			policyv1.POST("", policyHandler.Create)
+			policyv1.DELETE("", policyHandler.Delete)
+			policyv1.DELETE("/:name", policyHandler.DeleteCollection)
+			policyv1.PUT(":name", policyHandler.Update)
+			policyv1.GET("", policyHandler.List)
+			policyv1.GET(":name", policyHandler.Get)
 		}
 
 		// 密钥接口
 		secretv1 := v1.Group("/secrets")
 		{
-			secretv1.Use(auto.AuthFunc())
+			secretHandler := secret.NewSecretHandler(mysqlIns)
 
-			secretv1.POST("")
+			secretv1.POST("", secretHandler.Create)
+			secretv1.DELETE("", secretHandler.Delete)
+			secretv1.PUT(":name", secretHandler.Update)
+			secretv1.GET("", secretHandler.List)
+			secretv1.GET(":name", secretHandler.Get)
 		}
 	}
 

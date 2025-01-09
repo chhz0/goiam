@@ -6,7 +6,7 @@ import (
 )
 
 // KeyXRequestID 请求ID
-const KeyXRequestID = "X-Request-ID"
+const KeyXRequestID = "RequestID"
 
 func RequestId() gin.HandlerFunc {
 	return func(ctx *gin.Context) {

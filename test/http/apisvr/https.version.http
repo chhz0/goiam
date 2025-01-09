@@ -1,2 +1,0 @@
-### version get
-GET https://localhost:8443/version HTTP/1.1

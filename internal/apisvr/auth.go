@@ -10,6 +10,7 @@ import (
 	ginjwt "github.com/appleboy/gin-jwt/v2"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/chhz0/goiam/internal/apisvr/dal"
+	"github.com/chhz0/goiam/internal/pkg/logger"
 	"github.com/chhz0/goiam/internal/pkg/middleware"
 	"github.com/chhz0/goiam/internal/pkg/middleware/auth"
 	"github.com/chhz0/goiam/internal/pkg/model"
@@ -20,8 +21,8 @@ import (
 )
 
 type loginInfo struct {
-	Username string `json:"username" form:"username" query:"username" binding:"required,username"`
-	Password string `json:"password" form:"password" query:"password" binding:"required,password"`
+	Username string `json:"username" form:"username"`
+	Password string `json:"password" form:"password"`
 }
 
 func newBasicAuth() middleware.AuthStrategy {
@@ -197,7 +198,7 @@ func payloadFunc() func(data interface{}) jwt.MapClaims {
 func authorizator() func(data interface{}, c *gin.Context) bool {
 	return func(data interface{}, c *gin.Context) bool {
 		if v, ok := data.(string); ok {
-			log.L(c).Infof("apisvr.authorizator user: %s.", v)
+			log.L(c, logger.UseKeys...).Infof("apisvr.authorizator user: %s.", v)
 
 			return true
 		}

@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/chhz0/goiam/internal/apisvr/config"
+	"github.com/chhz0/goiam/internal/apisvr/dal"
 	"github.com/chhz0/goiam/internal/apisvr/dal/mysql"
 	"github.com/chhz0/goiam/internal/pkg/ginserver"
 	"github.com/chhz0/goiam/pkg/graceful"
@@ -14,13 +15,20 @@ type apiServer struct {
 	gracefulShutdown *graceful.GracefulShutdown
 	ginServer        *ginserver.Server
 	grpcServer       *grpcServer
-	// TODO redisServer gRPCServer
+	// TODO redisServer
 }
 
 func newAPIServer(cfg *config.Config) (*apiServer, error) {
 	// 创建优雅服务
 	gs := graceful.New()
 	gs.AddShutdownManager(posixsignal.NewPosixSignalManager())
+
+	// 创建mysql instance
+	mysqlFactory, err := mysql.GetMysqlFactoryOr(cfg.MySQL)
+	if err != nil {
+		return nil, err
+	}
+	dal.SetClient(mysqlFactory)
 
 	ginServerConf, err := buildGinServerConfig(cfg)
 	if err != nil {
@@ -69,7 +77,8 @@ func (s *apiServer) PreRun() *preApiServer {
 			_ = mysqlStore.Close()
 		}
 
-		s.grpcServer.Close()
+		// TODO: grpc
+		// s.grpcServer.Close()
 
 		_ = s.ginServer.Shutdown()
 
@@ -84,7 +93,7 @@ type preApiServer struct {
 }
 
 func (s *preApiServer) Run() error {
-	go s.grpcServer.Run()
+	// go s.grpcServer.Run()
 
 	if err := s.gracefulShutdown.Start(); err != nil {
 		log.Fatalf("start shutdown manager failed: %v", err)
